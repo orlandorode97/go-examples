@@ -36,20 +36,18 @@ type IndexerRequest struct {
 func main() {
 
 	for i := 0; i < 1000; i++ {
-		url := "http://localhost/tdo/orders/"
+		url := "https://api.lions-qe.omg.pub/tdo/orders/"
 
 		orderRequest := &OrderRequest{
 			Orders: []Order{{
 				Links: Link{
-					Sale: "PBETJ",
+					Sale: "4WWTW",
 				},
 			}},
 		}
 
 		payload, _ := json.Marshal(orderRequest)
 		req, _ := http.NewRequest("POST", url, strings.NewReader(string(payload)))
-
-		jwt := "your-jwt-token-here"
 
 		req.Header.Add("Content-Type", "application/json")
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
@@ -66,7 +64,7 @@ func main() {
 		}
 		fmt.Println(resp)
 
-		url = fmt.Sprintf("http://localhost/tdo/orders/%v/actions/confirm", resp.Orders[0].ID)
+		url = fmt.Sprintf("https://api.lions-qe.omg.pub/tdo/orders/%v/actions/confirm", resp.Orders[0].ID)
 
 		payloadReader := strings.NewReader("{\n\t\"gift_cards\": []\n}")
 
@@ -81,7 +79,7 @@ func main() {
 		body, _ = io.ReadAll(res.Body)
 		fmt.Println(string(body))
 
-		url = "http://localhost/indexer/index"
+		url = "https://api.lions-qe.omg.pub/indexer/index"
 
 		indexerRequest := &IndexerRequest{
 			DocType: "tdo_order",
