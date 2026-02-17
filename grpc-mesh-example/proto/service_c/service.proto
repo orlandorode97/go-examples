@@ -1,0 +1,15 @@
+syntax="proto3";
+
+package service_c;
+
+option go_package = "github.com/grpc-mesh/grpc-mesh-example/proto/service_c";
+
+service ServiceC {
+    rpc Ping(PingRequest) returns (PingResponse) {}
+}
+
+message PingRequest {}
+
+message PingResponse {
+    string message = 1;
+}

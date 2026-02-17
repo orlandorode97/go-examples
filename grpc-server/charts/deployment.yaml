@@ -26,6 +26,7 @@ metadata:
     cloud.google.com/app-protocols: '{"grpc-port": "HTTP2"}'
 spec:
   type: LoadBalancer
+  loadBalancerIP: 34.136.181.225
   ports:
     - name: grpc-port
       port: 50051

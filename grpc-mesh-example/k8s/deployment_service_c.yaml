@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-c
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: service-c
+  template:
+    metadata:
+      labels:
+        app: service-c
+    spec:
+      containers:
+        - name: service-c
+          image: us-central1-docker.pkg.dev/grpc-course-487620/grpc-repo/service-c:v1
+          ports:
+            - containerPort: 50051
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-c
+spec:
+  selector:
+    app: service-c
+  ports:
+    - port: 50051
+      targetPort: 50051
