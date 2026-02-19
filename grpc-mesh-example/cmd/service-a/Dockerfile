@@ -13,6 +13,7 @@ WORKDIR /app
 COPY --from=builder /app/app .
 
 EXPOSE 50051
+EXPOSE 8080
 
 USER nonroot:nonroot
 

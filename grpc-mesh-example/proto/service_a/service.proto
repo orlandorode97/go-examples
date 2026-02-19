@@ -1,15 +1,19 @@
-syntax="proto3";
+syntax = "proto3";
 
 package service_a;
+
+import "google/api/annotations.proto";
 
 option go_package = "github.com/grpc-mesh/grpc-mesh-example/proto/service_a";
 
 service ServiceA {
-    rpc Ping(PingRequest) returns (PingResponse) {}
+  rpc Ping(PingRequest) returns (PingResponse) {
+    option (google.api.http) = {get: "/v1/ping"};
+  }
 }
 
 message PingRequest {}
 
 message PingResponse {
-    string message = 1;
+  string message = 1;
 }

@@ -4,8 +4,10 @@ import (
 	"context"
 	"log"
 	"net"
+	"net/http"
 	"os"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/orlandorode97/grpc-mesh-example/generated/service_a"
 	"github.com/orlandorode97/grpc-mesh-example/generated/service_b"
 	"google.golang.org/grpc"
@@ -39,19 +41,28 @@ func (s *Server) Ping(ctx context.Context, req *service_a.PingRequest) (*service
 }
 
 func main() {
-	listener, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatal(err)
-	}
+	go func() {
+		listener, err := net.Listen("tcp", ":50051")
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	grpcServer := grpc.NewServer()
+		grpcServer := grpc.NewServer()
 
-	server := NewServer()
-	service_a.RegisterServiceAServer(grpcServer, server)
-	reflection.Register(grpcServer)
-	log.Println("Service A running on :50051")
+		server := NewServer()
+		service_a.RegisterServiceAServer(grpcServer, server)
+		reflection.Register(grpcServer)
+		log.Println("Service A running on :50051")
 
-	if err := grpcServer.Serve(listener); err != nil {
-		log.Fatal(err)
-	}
+		if err := grpcServer.Serve(listener); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	ctx := context.Background()
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+
+	service_a.RegisterServiceAHandlerFromEndpoint(ctx, mux, "localhost:50051", opts)
+	http.ListenAndServe(":8080", mux)
 }

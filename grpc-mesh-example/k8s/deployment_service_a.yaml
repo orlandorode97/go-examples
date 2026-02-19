@@ -16,7 +16,8 @@ spec:
         - name: service-a
           image: us-central1-docker.pkg.dev/grpc-course-487620/grpc-repo/service-a:v1
           ports:
-            - containerPort: 50051
+            - containerPort: 50051 # gRPC
+            - containerPort: 8080 # HTTP
           env:
             - name: SERVICE_B_ADDR
               value: service-b:50051
@@ -31,3 +32,5 @@ spec:
   ports:
     - port: 50051
       targetPort: 50051
+    - port: 8080
+      targetPort: 8080

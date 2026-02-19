@@ -7,6 +7,7 @@
 package service_a
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -105,12 +106,13 @@ var File_service_a_service_proto protoreflect.FileDescriptor
 
 const file_service_a_service_proto_rawDesc = "" +
 	"\n" +
-	"\x17service_a/service.proto\x12\tservice_a\"\r\n" +
+	"\x17service_a/service.proto\x12\tservice_a\x1a\x1cgoogle/api/annotations.proto\"\r\n" +
 	"\vPingRequest\"(\n" +
 	"\fPingResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2E\n" +
-	"\bServiceA\x129\n" +
-	"\x04Ping\x12\x16.service_a.PingRequest\x1a\x17.service_a.PingResponse\"\x00B8Z6github.com/grpc-mesh/grpc-mesh-example/proto/service_ab\x06proto3"
+	"\amessage\x18\x01 \x01(\tR\amessage2U\n" +
+	"\bServiceA\x12I\n" +
+	"\x04Ping\x12\x16.service_a.PingRequest\x1a\x17.service_a.PingResponse\"\x10\x82\xd3\xe4\x93\x02\n" +
+	"\x12\b/v1/pingB8Z6github.com/grpc-mesh/grpc-mesh-example/proto/service_ab\x06proto3"
 
 var (
 	file_service_a_service_proto_rawDescOnce sync.Once
