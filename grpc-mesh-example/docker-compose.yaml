@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  nginx-chido:
+    image: nginx:latest
+    ports:
+      - "81:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - service-a
+      - service-b
+      - service-c
+  service-c:
+    build:
+      context: .
+      dockerfile: cmd/service-c/Dockerfile
+    ports:
+      - "50053:50051"
+  service-b:
+    build:
+      context: .
+      dockerfile: cmd/service-b/Dockerfile
+    ports:
+      - "50052:50051"
+    environment:
+      - SERVICE_C_ADDR=service-c:50051
+    depends_on:
+      - service-c
+  service-a:
+    build:
+      context: .
+      dockerfile: cmd/service-a/Dockerfile
+    ports:
+      - "50051:50051"
+      - "8080:8080"
+    environment:
+      - SERVICE_B_ADDR=service-b:50051
+    depends_on:
+      - service-b
