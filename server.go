@@ -7,9 +7,7 @@ import (
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("📨 Recibí:", r.Method, r.URL.Path)
-	w.Header().Set("Connection", "close") // forzamos cierre TCP
-	fmt.Fprintf(w, "Hola desde servidor\n")
+	w.WriteHeader(519)
 }
 
 func main() {

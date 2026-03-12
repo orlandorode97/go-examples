@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/mem"
 )
 
 // CPUMetric holds a single CPU reading for one core.
@@ -21,6 +22,15 @@ type CPUMetric struct {
 	UserPercent   float64
 	SystemPercent float64
 	IdlePercent   float64
+}
+
+type MemMetric struct {
+	Time           time.Time
+	Host           string
+	TotalBytes     uint64
+	AvailableBytes uint64
+	UsedBytes      uint64
+	UsedPercent    float64
 }
 
 // collect scrapes per-core CPU metrics and returns one CPUMetric per core,
@@ -70,6 +80,35 @@ func collect(ctx context.Context, host string) ([]CPUMetric, error) {
 	return metrics, nil
 }
 
+func collectMem(ctx context.Context, host string) (*MemMetric, error) {
+	v, err := mem.VirtualMemoryWithContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("mem.VirtualMemory: %w", err)
+	}
+
+	return &MemMetric{
+		Time:           time.Now(),
+		Host:           host,
+		TotalBytes:     v.Total,
+		AvailableBytes: v.Available,
+		UsedBytes:      v.Used,
+		UsedPercent:    v.UsedPercent,
+	}, nil
+}
+
+func flushMem(ctx context.Context, pool *pgxpool.Pool, m *MemMetric) error {
+	cols := []string{"time", "host", "total_bytes", "available_bytes", "used_bytes", "used_percent"}
+
+	_, err := pool.CopyFrom(ctx,
+		pgx.Identifier{"mem_metrics"},
+		cols,
+		pgx.CopyFromSlice(1, func(i int) ([]any, error) {
+			return []any{m.Time, m.Host, m.TotalBytes, m.AvailableBytes, m.UsedBytes, m.UsedPercent}, nil
+		}),
+	)
+	return err
+}
+
 // flush writes a batch of CPUMetrics to TimescaleDB using the COPY protocol.
 func flush(ctx context.Context, pool *pgxpool.Pool, metrics []CPUMetric) error {
 	if len(metrics) == 0 {
@@ -116,16 +155,21 @@ func main() {
 	for range ticker.C {
 		metrics, err := collect(ctx, host)
 		if err != nil {
-			log.Printf("collect error: %v", err)
-			continue
+			log.Printf("cpu collect error: %v", err)
+		} else if err := flush(ctx, pool, metrics); err != nil {
+			log.Printf("cpu flush error: %v", err)
+		} else {
+			log.Printf("flushed %d cpu metrics", len(metrics))
 		}
 
-		if err := flush(ctx, pool, metrics); err != nil {
-			log.Printf("flush error: %v", err)
-			continue
+		memMetric, err := collectMem(ctx, host)
+		if err != nil {
+			log.Printf("mem collect error: %v", err)
+		} else if err := flushMem(ctx, pool, memMetric); err != nil {
+			log.Printf("mem flush error: %v", err)
+		} else {
+			log.Printf("flushed mem metric: used=%.1f%%", memMetric.UsedPercent)
 		}
-
-		log.Printf("flushed %d cpu metrics", len(metrics))
 	}
 }
 
