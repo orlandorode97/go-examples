@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SQL Table</title>
+</head>
+<body>
+  <div id="app">
+    <div class="connection-panel">
+      <h2>Connection</h2>
+      <div class="form-group">
+        <input type="text" id="host" placeholder="Host" value="localhost">
+        <input type="text" id="port" placeholder="Port" value="3306">
+        <input type="text" id="username" placeholder="Username" value="root">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="connect()">Connect</button>
+      </div>
+      <div id="connection-status"></div>
+    </div>
+
+    <div class="query-panel">
+      <h2>Query</h2>
+      <textarea id="query" rows="5" placeholder="SELECT * FROM ..."></textarea>
+      <button onclick="executeQuery()">Execute</button>
+    </div>
+
+    <div class="results-panel">
+      <h2>Results</h2>
+      <div id="results"></div>
+    </div>
+  </div>
+  <script src="./src/main.js" type="module"></script>
+</body>
+</html>
